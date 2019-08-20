@@ -25,14 +25,11 @@ subscription-manager register
 ./subscribe-all.sh
 ```
 
-4. Generate a list of all repository IDs and save these to a file.
-```
-subscription-manager repos --list | grep 'Repo ID' | awk '{print $3}' | sort -u > available-repos.txt
-```
+4. Execute `create-available-repos-file.sh` to create the file `available-repos.txt`. This file will contain all available repositories (one repository ID per line) that you can sync from. 
 
 5. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the `available-repos.txt` file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
 
-6. Sync all of the repositories to the local system using this repos `sync-repos.sh` script. The first argument is the file that contains the repositories that you want to sync (one repo ID for each line) and the second argument is the directory they will be synced to
+6. Sync all of the repositories to the local system using this repos `sync-repos.sh` script. The first argument is the file that contains the repositories that you want to sync and the second argument is the directory they will be synced to
 ```
 ./sync-repos.sh enabled-repos.txt repositories
 ```
