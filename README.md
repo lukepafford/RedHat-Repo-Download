@@ -30,7 +30,7 @@ subscription-manager register
 subscription-manager repos --list | grep 'Repo ID' | awk '{print $3}' | sort -u > available-repos.txt
 ```
 
-5. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
+5. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the `available-repos.txt` file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
 
 6. Sync all of the repositories to the local system using this repos helper sync script. The first argument is the file that contains the repositories that you want to sync (one repo ID for each line) and the second argument is the directory they will be synced to
 ```
