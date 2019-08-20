@@ -12,29 +12,38 @@ This guide makes the following assumptions:
 
 
 ## Process
-
-1. Clone this repository to your target system
-
-2. Register the system to Redhat.
+1. Register the system to Redhat.
 ```
 subscription-manager register
 ```
 
-3. Attach all available subscriptions to the system. Execute this repos `subscribe-all.sh` script to quickly attach subscriptions to the system.
+2. Temporarily auto attach a subscription to allow us to install packages
 ```
-./subscribe-all.sh
-```
-
-4. Execute `create-available-repos-file.sh` to create the file `available-repos.txt`. This file will contain all available repositories (one repository ID per line) that you can sync from. 
-```
-./create-available-repos-file.sh
+subscription-manager attach --auto
 ```
 
-5. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the `available-repos.txt` file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
-
-6. Sync all of the repositories to the local system using this repos `sync-repos.sh` script. The first argument is the file that contains the repositories that you want to sync and the second argument is the directory they will be synced to
+3. Install Git and clone this repository to your target system
 ```
-./sync-repos.sh enabled-repos.txt repositories
+yum -y install git
+git clone https://github.com/lukepafford/RedHat-Repo-Download.git
+cd RedHat-Repo-Download
+```
+
+4. Attach all available subscriptions to the system. Execute this repos `subscribe-all.sh` script to quickly attach subscriptions to the system.
+```
+bash subscribe-all.sh
+```
+
+5. Execute `create-available-repos-file.sh` to create the file `available-repos.txt`. This file will contain all available repositories (one repository ID per line) that you can sync from. 
+```
+bash create-available-repos-file.sh
+```
+
+6. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the `available-repos.txt` file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
+
+7. Sync all of the repositories to the local system using this repos `sync-repos.sh` script. The first argument is the file that contains the repositories that you want to sync and the second argument is the directory they will be synced to
+```
+bash sync-repos.sh enabled-repos.txt repositories
 ```
 
 ## Conclusion
