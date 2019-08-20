@@ -12,24 +12,27 @@ This guide makes the following assumptions:
 
 
 ## Process
+
+1. Clone this repository to your target system
+
 1. Register the system to Redhat.
 ```
 subscription-manager register
 ```
 
-2. Attach all available subscriptions to the system. Execute this repos helper script to quickly attach subscriptions to the system.
+1. Attach all available subscriptions to the system. Execute this repos helper script to quickly attach subscriptions to the system.
 ```
 ./subscribe-all.sh
 ```
 
-3. Generate a list of all repository IDs and save these to a file.
+1. Generate a list of all repository IDs and save these to a file.
 ```
 subscription-manager repos --list | grep 'Repo ID' | awk '{print $3}' | sort -u > available-repos.txt
 ```
 
-4. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
+1. Dependening on how many subscriptions you have, there may be a large amount of repositories, and you likely won't want to sync all the content. Copy the file, and manually delete any repositories that you don't want. Name this file to something appropriate such as `enabled-repos.txt`
 
-5. Sync all of the repositories to the local system using this repos helper sync script. The first argument is the file that contains the repositories that you want to sync (one repo ID for each line) and the second argument is the directory they will be synced to
+1. Sync all of the repositories to the local system using this repos helper sync script. The first argument is the file that contains the repositories that you want to sync (one repo ID for each line) and the second argument is the directory they will be synced to
 ```
 ./sync-repos.sh enabled-repos.txt repositories
 ```
