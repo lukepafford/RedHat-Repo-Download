@@ -1,0 +1,30 @@
+---
+- name: Synchronize the repository
+  block:
+    - debug:
+        msg: Syncing repo {{ repo_id }} to {{ repo_mapping[repo_id] }}
+      
+      # Ensure dest directory exists before syncing
+    - file:
+        path: '{{ repo_mapping[repo_id] }}'
+        state: directory
+      become: yes
+      
+    - synchronize:
+        src: '{{ item.path | dirname }}/'
+        dest: '{{ repo_mapping[repo_id] }}'
+        archive: no
+        recursive: yes
+        times: yes
+      become: yes
+    
+    - import_tasks: update_metadata.yml
+      become: yes
+      
+    - name: Add the repo_id to the cache so it will be skipped if the playbook fails
+      shell: echo {{ repo_id }} >> {{ syncCache }}
+      delegate_to: localhost
+      become: no
+  resuce:
+    - debug:
+        msg: Failed to synchronize repository {{ repo_id }} at {{ item.path }}
