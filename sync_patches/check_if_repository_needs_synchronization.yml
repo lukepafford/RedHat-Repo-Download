@@ -1,0 +1,14 @@
+---
+- name: Extract the repo_id from the path
+  set_fact:
+    repo_id: '{{ item.path | dirname | basename }}'
+    
+- name: Check if the repository is in the cache
+  command: grep '{{ repo_id }}' '{{ syncCache }}'
+  delegate_to: localhost
+  register: host_in_cache
+  changed_when: host_in_cache.rc >= 1
+  failed_when: false
+  
+- import_tasks: synchronize_repository.yml
+  when: host_in_cache.rc != 0
