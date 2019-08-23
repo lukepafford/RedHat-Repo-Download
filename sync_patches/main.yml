@@ -1,0 +1,81 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: target_host
+      prompt: Satellite server
+      private: no
+  tasks:
+    - add_host:
+        name: '{{ target_host }}'
+        groups: dynamic_hosts
+        
+- hosts: dynamic_hosts
+  vars:
+    mappingFile: '/tmp/satellite-repo-mapping.csv'
+    localMappingFile: '{{ mappingFile | basename }}'
+    transformedMappingFile: '{{ localMappingFile | splitext | first }}.json'
+    syncCache: 'synced_repos.cache'
+  vars_prompt:
+    - name: src
+      prompt: 'Source directory containing patches. The directory names must be equal to the repository I.D.'
+      private: no
+      default: '{{ lookup("env", "PWD") }}'
+      
+    - name: baseDest
+      prompt: 'Base directory on the Satellite server that the patches will be copied into'
+      default: '/var/www/html/pub/cdnroot'
+      private: no
+  tasks:
+    - name: Generate the mapping of repository IDs and the Satellite content URLs
+      command: psql -d candlepin -c "COPY (SELECT label,contenturl from cp2_content) To '{{ mappingFile }}' With CSV DELIMITER ',';"
+      become: yes
+      become_user: postgres
+      
+    - name: Fetch the results
+      fetch:
+        src: '{{ mappingFile }}'
+        dest: '{{ localMappingFile }}'
+        flat: yes
+        
+    - name: Transform the mapping files to contain a valid destination that we can copy to
+      script: transform-satellite-repo-mapping.py {{ localMappingFile }} {{ transformedMappingFile }} {{ baseDest }}
+      delegate_to: localhost
+      
+    - name: Find all 'Packages' directories
+      find:
+        paths: '{{ src }}'
+        file_type: 'directory'
+        patterns: 'Packages'
+        recurse: yes
+      register: repos
+      delegate_to: localhost
+      
+    - name: Read dictionary of repo IDs and their content_urls
+      include_vars:
+        file: '{{ transformedMappingFile }}'
+        name: repo_mapping
+        
+    - name: Ensure createrepo is installed
+      yum:
+        name: createrepo
+        state: present
+        
+    - include_tasks: check_if_repository_needs_synchronization.yml
+      loop: '{{ repos.files }}'
+      
+    - name: Cleanup generated files on the server
+      file:
+        path: '{{ mappingFile }}'
+        state: absent
+      become: yes
+      
+    - name: Cleanup locally generated files
+      file:
+        path: '{{ item }}'
+        state: absent
+      loop:
+        - '{{ localMappingFile }}'
+        - '{{ transformedMappingFile }}'
+        - '{{ syncCache }}'
+      delegate_to: localhost
