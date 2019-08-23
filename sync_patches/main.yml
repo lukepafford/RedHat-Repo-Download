@@ -13,9 +13,9 @@
 - hosts: dynamic_hosts
   vars:
     mappingFile: '/tmp/satellite-repo-mapping.csv'
-    localMappingFile: '{{ mappingFile | basename }}'
+    localMappingFile: '{{ playbook_dir }}/{{ mappingFile | basename }}'
     transformedMappingFile: '{{ localMappingFile | splitext | first }}.json'
-    syncCache: 'synced_repos.cache'
+    syncCache: '{{ playbook_dir }}/synced_repos.cache'
   vars_prompt:
     - name: src
       prompt: 'Source directory containing patches. The directory names must be equal to the repository I.D.'
