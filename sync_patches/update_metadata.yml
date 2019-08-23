@@ -1,0 +1,40 @@
+- name: Find any group metadata
+  find:
+    path: '{{ repo_mapping[repo_id] }}'
+    patterns: 'comps.xml'
+  register: group_metadata
+  
+- name: Show the repodata path
+  debug:
+    msg: '{{ repo_mapping[repo_id] }}'
+    
+- name: Update repository metadata with group info
+  command: createrepo --update --groupfile comps.xml ./
+  args:
+    chdir: '{{ repo_mapping[repo_id] }}'
+  when: group_metadata.matched == 1
+  
+- name: Update repository metadata
+  command: createrepo --update ./
+  args:
+    chdir: '{{ repo_mapping[repo_id] }}'
+  when: group_metadata.matched == 0
+  
+- name: Find any security metadata
+  find:
+    path: '{{ repo_mapping[repo_id] }}'
+    patterns: '*updateinfo.xml.gz'
+  register: security_metadata
+  
+- name: Update repository with security metadata
+  command: modifyrepo {{ security_metadata.files[0].path }} {{ repo_mapping[repo_id] }}/repodata
+  when: security_metadata.matched == 1
+  
+- name: Set apache permissions on the repo
+  file:
+    path: '{{ repo_mapping[repo_id] }}'
+    state: directory
+    recurse: yes
+    owner: apache
+    group: apache
+    mode: u=rwX,g=rwX,o=rX
