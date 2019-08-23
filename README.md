@@ -11,6 +11,8 @@ This guide makes the following assumptions:
 1. The account has at least one valid subscription that can be attached to the system.
 
 
+# Downloading Patches
+
 ## Process
 1. Register the system to Redhat.
 ```
@@ -49,3 +51,25 @@ bash sync-repos.sh enabled-repos.txt repositories
 ## Conclusion
 
 Your system should now have all of the desired content synced locally, and you can move the content to your disconnected systems, and make it available.
+
+# Syncing patches to offline Satellite server (optional)
+
+If you run an offline Satellite server and host your own CDN, then you can use this repos ansible playbook at `sync_patches/main.yml`.
+The playbook is risky since it depends on an implementation detail of Satellite by querying the Postgresql database to get repository information.
+
+1. Ensure you have `ansible` installed on the system that contains the patches.
+2. Execute the playbook. You will be prompted for three values: 
+  * The Satellite server hostname to connect to.
+  * The directory containing the patches.
+  * The base directory on the Satellite server where the files will be copied to. 
+  
+The playbook will synchronize all the content, update the repository metadata, and set proper permissions so Apache can access the files.
+```
+cd sync_patches
+ansible-playbook main.yml
+```
+3. Synchronize all the repositories in the web UI (This could be automated but the web app does this best).
+4. Publish new content views.
+
+Your clients should now see the new content:
+`yum clean all && yum makecache && yum update`
