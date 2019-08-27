@@ -9,7 +9,7 @@
     msg: '{{ repo_mapping[repo_id] }}'
     
 - name: Update repository metadata with group info
-  command: createrepo --update --groupfile comps.xml ./
+  command: createrepo_c --update --groupfile comps.xml ./
   args:
     chdir: '{{ repo_mapping[repo_id] }}'
   when: group_metadata.matched == 1
