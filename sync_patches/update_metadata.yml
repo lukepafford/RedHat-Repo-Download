@@ -30,6 +30,16 @@
   command: modifyrepo {{ security_metadata.files[0].path }} {{ repo_mapping[repo_id] }}/repodata
   when: security_metadata.matched == 1
   
+- name: Find any product ids
+  find:
+    path: '{{ repo_mapping[repo_id] }}'
+    patterns: 'productid'
+  register: productid
+  
+- name: Update repository with the productid
+  command: modifyrepo {{ productid.files[0].path }} {{ repo_mapping[repo_id] }}/repodata
+  when: productid.matched == 1
+  
 - name: Set apache permissions on the repo
   file:
     path: '{{ repo_mapping[repo_id] }}'
