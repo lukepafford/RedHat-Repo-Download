@@ -15,4 +15,4 @@ for repoId in $(cat "$repoFile"); do
         reposync --repoid=$repoId --downloadcomps --download-metadata --newest-only --download_path=$dest
 done
 
-python get-yum-vars.py > yum_vars.json
+python get-yum-vars.py > $dest/yum_vars.json
