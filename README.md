@@ -56,6 +56,7 @@ Your system should now have all of the desired content synced locally, and you c
 
 If you run an offline Satellite server and host your own CDN, then you can use this repos ansible playbook at `sync_patches/main.yml`.
 The playbook is risky since it depends on an implementation detail of Satellite by querying the Postgresql database to get repository information.
+*WARNING* This playbook will only work for a yum `releasever` value of either `7Workstation` or `7Server`.
 
 1. Ensure you have `ansible` installed on the system that contains the patches.
 2. Execute the playbook. You will be prompted for three values: 
