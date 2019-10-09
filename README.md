@@ -2,7 +2,7 @@
 Documentation and scripts for syncing content from a Redhat Subscribed system for offline use.
 
 
-> ️⚠ **WARNING** scripts not listed in the `README.md` are for personal use, and you dont have to pay attention to them.
+> ️⚠ **WARNING** scripts not listed in this `README.md` are for personal use, and you dont have to pay attention to them.
 
 
 This repo will implement [RedHats 2nd approach](https://access.redhat.com/solutions/29269) for updating disconnected systems.
