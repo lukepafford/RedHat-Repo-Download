@@ -1,6 +1,10 @@
 # RedHat-Repo-Download
 Documentation and scripts for syncing content from a Redhat Subscribed system for offline use.
 
+
+> ️⚠ **WARNING** scripts not listed in the `README.md` are for personal use, and you dont have to pay attention to them.
+
+
 This repo will implement [RedHats 2nd approach](https://access.redhat.com/solutions/29269) for updating disconnected systems.
 If you wanted to sync content for RedHat 7 servers, and workstations you would need to create two machines that perform the syncing; one system for syncing workstation content, and one system for syncing server content.
 
