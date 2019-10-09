@@ -1,0 +1,6 @@
+https://repo.continuum.io/pkgs/main/linux-64/
+https://repo.continuum.io/pkgs/main/win-64/
+https://repo.continuum.io/pkgs/main/noarch/
+https://repo.continuum.io/pkgs/r/linux-64/
+https://repo.continuum.io/pkgs/r/win-64/
+https://repo.continuum.io/pkgs/r/noarch/
