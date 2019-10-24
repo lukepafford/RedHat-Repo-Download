@@ -15,7 +15,7 @@ with open(cache_name, 'a+') as cache_handle:
 	try:
 		cache: List[str] = json.load(cache_handle)
 	except JSONDecodeError:
-		cache: List[str] = []
+		cache = []
 
 	for image in all_images:
 		if image not in cache:
