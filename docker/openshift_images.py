@@ -185,7 +185,7 @@ image_map: Dict[Namespace, Dict[Repository, Tags]] = {
 	},
 	'dotnet': {
 		'dotnetcore-10-rhel7': ['1.0'],
-		'dotnetcore-10-rhel7': ['1.1'],
+		'dotnetcore-11-rhel7': ['1.1'],
 		'dotnetcore-20-rhel7': ['2.0'],
 		'dotnetcore-21-rhel7': ['2.1'],
 		'dotnetcore-22-rhel7': ['2.2'],
