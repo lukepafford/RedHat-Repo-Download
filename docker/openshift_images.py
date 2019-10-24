@@ -38,7 +38,7 @@ complete. These are the images developers will actually use to build apps.
 """
 from typing import List, Dict, NewType, Union
 
-system_tag_version: str = 'v3.11.146'
+system_tag_version: str = 'v3.11.153'
 registry = 'registry.redhat.io'
 
 
