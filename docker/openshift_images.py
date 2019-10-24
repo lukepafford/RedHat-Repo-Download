@@ -19,6 +19,9 @@ User code only needs to concern itself with `component_images`, and `user_images
 * `component_images` and `component_images_no_changes` lists are created from
   https://docs.openshift.com/container-platform/3.11/install/disconnected_install.html#disconnected-syncing-images
 
+  `component_images_no_changes` contains images that don't have a tag specified from the link, and etcd, which
+  looks like it requires its own specific version
+
 * `system_tag_version` is the shared tag used by all required OpenShift component images
 
 * `registry` is the domain name of the image registry
@@ -34,7 +37,7 @@ system_tag_version: str = 'v3.11.135'
 registry = 'registry.redhat.io'
 
 
-component_images: List[str] = [
+component_images_no_tag: List[str] = [
 	'registry.redhat.io/openshift3/apb-base',
 	'registry.redhat.io/openshift3/apb-tools',
 	'registry.redhat.io/openshift3/automation-broker-apb',
@@ -149,6 +152,8 @@ component_images_no_changes: List[str] = [
 	'registry.redhat.io/rhgs3/rhgs-s3-server-rhel7',
 ]
 
+component_images: List[str] = [ f'{url}:{system_tag_version}' for url in component_images_no_tag ]
+component_images.extend(component_images_no_changes)
 
 
 
@@ -156,8 +161,6 @@ Namespace = str
 Repository = str
 Tags = List[str]
 
-# This mapping is built from the openshift cockpit console "Cluster > Images" section
-# Any image it expects to see is included in this dictionary
 image_map: Dict[Namespace, Dict[Repository, Tags]] = {
 	'fuse7': {
 		'fuse-apicurito': ['1.2','1.3'],
