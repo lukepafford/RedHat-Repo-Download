@@ -17,7 +17,7 @@ User code only needs to concern itself with `component_images`, and `user_images
 
 `component_images` contains a list of all image URLs that are required to perform an 
 offline installation.
-`user_images` s the list of images that Openshift expects to have access to once the install is 
+`user_images` is the list of images that Openshift expects to have access to once the install is 
 complete. These are the images developers will actually use to build apps.
 
 
