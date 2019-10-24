@@ -15,6 +15,11 @@ Variables
 ==========
 User code only needs to concern itself with `component_images`, and `user_images`.
 
+`component_images` contains a list of all image URLs that are required to perform an 
+offline installation.
+`user_images` s the list of images that Openshift expects to have access to once the install is 
+complete. These are the images developers will actually use to build apps.
+
 
 * `component_images` and `component_images_no_changes` lists are created from
   https://docs.openshift.com/container-platform/3.11/install/disconnected_install.html#disconnected-syncing-images
