@@ -20,7 +20,7 @@ with open(cache_name, 'a+') as cache_handle:
 	for image in all_images:
 		if image not in cache:
 			res = run(['/bin/docker', 'pull', image])
-			if res.returncode == 0:
+			if res.returncode != 0:
 				# We had an error, Save results so we don't repeat on next run
 				# and start back up on the image that caused the error
 				json.dump(cache, cache_handle)	
