@@ -52,7 +52,7 @@ def pull_image(url: str, retries: int = 3):
 	if res.returncode == 0:
 		return
 
-	# This is the main error we want to fix, we likely have a typo in one of our url urls
+	# This is the main error we want to fix, we likely have a typo in one of our urls
 	elif res.stderr.lower().strip().endswith('not found'):
 		raise Exception(f'Failed to pull url {url}. Check the spelling of the url')
 
