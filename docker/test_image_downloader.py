@@ -15,7 +15,7 @@ def test_line_entries():
 	
 	try:
 		def check_num_greater_than_four(num):
-			assert num >= '5'
+			assert num >= '4'
 		
 		@cache_line_entries(temp_file)
 		def process_nums(num):
