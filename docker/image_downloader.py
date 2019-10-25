@@ -20,6 +20,9 @@ def main():
 	for image in all_images:
 		process_image(image)
 
+	# Remove the cache file
+	cache_path.unlink()
+
 
 def cache_line_entries(cache_path):
 	"""
@@ -47,9 +50,7 @@ def pull_image(url: str, retries: int = 3):
 
 	# Exit on successful pull
 	if res.returncode == 0:
-		print(res.stdout)
 		return
-
 
 	# This is the main error we want to fix, we likely have a typo in one of our url urls
 	elif res.stderr.lower().strip().endswith('not found'):
