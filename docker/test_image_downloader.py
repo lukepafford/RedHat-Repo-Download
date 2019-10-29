@@ -6,14 +6,14 @@ import os
 def test_line_entries():
 	_, temp_file = mkstemp()
 	
-	# nums is a list of strings because the cache were testing reads
-	# the items as strings
-	nums: List[str] = ['1', '2', '3', '4', '5']
-	with open(temp_file, 'w') as test_handle:
-		for n in range(1, 4):
-			test_handle.write(f'{n}\n')
-	
 	try:
+		# nums is a list of strings because the cache were testing reads
+		# the items as strings
+		nums: List[str] = ['1', '2', '3', '4', '5']
+		with open(temp_file, 'w') as test_handle:
+			for n in range(1, 4):
+				test_handle.write(f'{n}\n')
+	
 		def check_num_greater_than_four(num):
 			assert num >= '4'
 		
