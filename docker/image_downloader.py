@@ -5,23 +5,42 @@ from pathlib import Path
 from subprocess import run, PIPE
 from functools import wraps
 from util import get_container_exe
-import sys
+from argparse import ArgumentParser
+import sys, datetime, os
 
 
 def main():
+    parser: ArgumentParser = ArgumentParser(
+        description="Downloads, and saves Openshift images for offline loading"
+    )
+    parser.add_argument("action", choices=["download", "save"])
+    parser.add_argument(
+        "--save-output-dir",
+        default=os.getcwd(),
+        required=False,
+        help="Directory used to save tar archives. One tar archive per image.",
+    )
+
+    args = parser.parse_args()
+
     all_images: List[str] = user_images + component_images
-    cache_path: Path = Path(sys.argv[0]).resolve().parent / ".images.txt"
 
-    @cache_line_entries(cache_path)
-    def process_image(image):
-        pull_image(image)
+    if args.action == "download":
+        cache_path: Path = Path(sys.argv[0]).resolve().parent / ".images.txt"
 
-    # Process all images
-    for image in all_images:
-        process_image(image)
+        @cache_line_entries(cache_path)
+        def process_image(image):
+            pull_image(image)
 
-    # Remove the cache file
-    cache_path.unlink()
+        # Process all images
+        for image in all_images:
+            process_image(image)
+
+        # Remove the cache file
+        cache_path.unlink()
+
+    elif args.action == "save":
+        save_images(args.save_output_dir, all_images)
 
 
 def cache_line_entries(cache_path):
@@ -65,6 +84,24 @@ def pull_image(url: str, retries: int = 3):
 
     else:
         raise Exception(f"Failed to pull url {url}. Error: {res.stderr}")
+
+
+def save_images(tar_dir: str, images: List[str]):
+    os.makedirs(tar_dir, exist_ok=True)
+    for image in images:
+        res = run(
+            [
+                get_container_exe(),
+                "save",
+                "-o",
+                f"{tar_dir}/{image.replace('/','_').replace(':', '_')}.tar",
+                image,
+            ],
+            stderr=PIPE,
+            universal_newlines=True,
+        )
+        if res.returncode != 0:
+            raise ChildProcessError(res.stderr)
 
 
 if __name__ == "__main__":

@@ -27,7 +27,8 @@ complete. These are the images developers will actually use to build apps.
   `component_images_no_changes` contains images that don't have a tag specified from the link, and etcd, which
   looks like it requires its own specific version
 
-* `system_tag_version` is the shared tag used by all required OpenShift component images
+* `system_tag_version` is the shared tags used by all required OpenShift
+component images. you should explicitly set this to what version you require
 
 * `registry` is the domain name of the image registry
 
@@ -38,7 +39,7 @@ complete. These are the images developers will actually use to build apps.
 """
 from typing import List, Dict, NewType, Union
 
-system_tag_version: str = "v3.11.153"
+system_tag_version: List[str] = ["v3.11.153", "v3.11.135"]
 registry = "registry.redhat.io"
 
 
@@ -57,6 +58,7 @@ component_images_no_tag: List[str] = [
     "registry.redhat.io/openshift3/mediawiki",
     "registry.redhat.io/openshift3/mediawiki-apb",
     "registry.redhat.io/openshift3/mysql-apb",
+    "registry.redhat.io/openshift3/ose",
     "registry.redhat.io/openshift3/ose-ansible-service-broker",
     "registry.redhat.io/openshift3/ose-cli",
     "registry.redhat.io/openshift3/ose-cluster-autoscaler",
@@ -165,7 +167,9 @@ component_images_no_changes: List[str] = [
 ]
 
 component_images: List[str] = [
-    f"{url}:{system_tag_version}" for url in component_images_no_tag
+    f"{url}:{system_tag}"
+    for url in component_images_no_tag
+    for system_tag in system_tag_version
 ]
 component_images.extend(component_images_no_changes)
 
@@ -178,7 +182,8 @@ image_map: Dict[Namespace, Dict[Repository, Tags]] = {
     "fuse7": {
         "fuse-apicurito": ["1.2", "1.3"],
         "fuse-apicurito-generator": ["1.2", "1.3"],
-        #"fuse-console": ["1.0", "1.1", "1.3", "1.4"],
+        # Version 1.4 had errors downloading so it is removed
+        # "fuse-console": ["1.0", "1.1", "1.3", "1.4"],
         "fuse-console": ["1.0", "1.1", "1.3"],
         "fuse-eap-openshift": ["1.0", "1.1", "1.2", "1.3"],
         "fuse-java-openshift": ["1.0", "1.1", "1.2", "1.3"],

@@ -1,0 +1,8 @@
+Execute the image_downloader.py file to run:
+
+	# Download openshift images
+  python3 image_downloader.py download
+
+	# Save openshift images to directory of tar archives that can be used with
+	# `docker load`
+	python3 image_downloader.py save --save-output-dir tar_archive_directory
