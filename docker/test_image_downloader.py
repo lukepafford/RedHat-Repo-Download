@@ -2,6 +2,7 @@ from image_downloader import cache_line_entries
 from tempfile import mkstemp
 from typing import List
 from util import get_container_exe
+from openshift_images import OpenshiftImages
 import os, pytest
 
 
@@ -28,6 +29,12 @@ def test_line_entries():
     finally:
         os.remove(temp_file)
 
+
 def test_get_container_exe():
     with pytest.raises(FileNotFoundError):
-        get_container_exe(['some-long-program-that-isnt-installed#######'])
+        get_container_exe(["some-long-program-that-isnt-installed#######"])
+
+
+def test_openshift_images_has_length():
+    openshift_images = OpenshiftImages()
+    assert len(openshift_images.all_images) > 0

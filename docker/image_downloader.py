@@ -1,29 +1,38 @@
 #!/usr/bin/python3
-from openshift_images import user_images, component_images
+from openshift_images import OpenshiftImages
 from typing import List
 from pathlib import Path
 from subprocess import run, PIPE
 from functools import wraps
 from util import get_container_exe
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import sys, datetime, os
 
 
 def main():
     parser: ArgumentParser = ArgumentParser(
-        description="Downloads, and saves Openshift images for offline loading"
+        description="Downloads, and saves Openshift images for offline loading",
+        formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("action", choices=["download", "save"])
     parser.add_argument(
         "--save-output-dir",
-        default=os.getcwd(),
+        default=Path(os.getcwd(), f"openshift_saved_images_{datetime.date.today()}"),
         required=False,
         help="Directory used to save tar archives. One tar archive per image.",
     )
+    parser.add_argument(
+        "--openshift-versions",
+        nargs="*",
+        default=["v3.11.135", "v3.11.153"],
+        required=False,
+        help="""Openshift versions that are used to tag all required images.
+            This argument must be provided after the 'download' positional
+            parameter """,
+    )
 
     args = parser.parse_args()
-
-    all_images: List[str] = user_images + component_images
+    openshift_images = OpenshiftImages(openshift_versions=args.openshift_versions)
 
     if args.action == "download":
         cache_path: Path = Path(sys.argv[0]).resolve().parent / ".images.txt"
@@ -33,14 +42,14 @@ def main():
             pull_image(image)
 
         # Process all images
-        for image in all_images:
+        for image in openshift_images.all_images:
             process_image(image)
 
         # Remove the cache file
         cache_path.unlink()
 
     elif args.action == "save":
-        save_images(args.save_output_dir, all_images)
+        save_images(args.save_output_dir, openshift_images.all_images)
 
 
 def cache_line_entries(cache_path):
@@ -89,14 +98,15 @@ def pull_image(url: str, retries: int = 3):
 def save_images(tar_dir: str, images: List[str]):
     os.makedirs(tar_dir, exist_ok=True)
     for image in images:
+        filename = f"{tar_dir}/{image.replace('/','_').replace(':', '_')}.tar"
+        # Do not save the image if the saved file already exists from a
+        # previous execution
+        if Path(filename).is_file:
+            continue
+
+        # save the image
         res = run(
-            [
-                get_container_exe(),
-                "save",
-                "-o",
-                f"{tar_dir}/{image.replace('/','_').replace(':', '_')}.tar",
-                image,
-            ],
+            [get_container_exe(), "save", "-o", filename, image,],
             stderr=PIPE,
             universal_newlines=True,
         )

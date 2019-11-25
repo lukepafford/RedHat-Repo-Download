@@ -9,39 +9,39 @@ of container images that can be downloaded from RedHats registry.
 This module was created so that it would be easy to modify and extend any images to these lists
 with minimal hassle.
 
+The `OpenshiftImages` class aggregates all the images into a single list
+variable and is accessible from the `instance.all_images` variable.
+This class is used in `image_downloader.py`, so you don't need to pay
+attention to anything in here.
 
 
 Variables
 ==========
-User code only needs to concern itself with `component_images`, and `user_images`.
-
-`component_images` contains a list of all image URLs that are required to perform an 
+`self._component_images` contains a list of all image URLs that are required to perform an 
 offline installation.
-`user_images` is the list of images that Openshift expects to have access to once the install is 
+
+`self._user_images` is the list of images that Openshift expects to have access to once the install is 
 complete. These are the images developers will actually use to build apps.
 
 
-* `component_images` and `component_images_no_changes` lists are created from
+* `self._component_images` and `component_images_no_changes` lists are created from
   https://docs.openshift.com/container-platform/3.11/install/disconnected_install.html#disconnected-syncing-images
 
   `component_images_no_changes` contains images that don't have a tag specified from the link, and etcd, which
   looks like it requires its own specific version
 
-* `system_tag_version` is the shared tags used by all required OpenShift
-component images. you should explicitly set this to what version you require
+* `self.openshift_versions` is the shared tags used by all required OpenShift
+component images. This should be explicitly set to what version you require.
+It is set to `['v3.11.135', 'v3.11.153'] by default.
 
-* `registry` is the domain name of the image registry
+* `self.registry` is the domain name of the image registry
 
-* `user_images` is a list of image URLs that OpenShift expects to have in its registry
+* `self._user_images` is a list of image URLs that OpenShift expects to have in its registry
 
 * `image_map` is the dictionary that is used to build the URLs in `user_images`
 
 """
 from typing import List, Dict, NewType, Union
-
-system_tag_version: List[str] = ["v3.11.153", "v3.11.135"]
-registry = "registry.redhat.io"
-
 
 component_images_no_tag: List[str] = [
     "registry.redhat.io/openshift3/apb-base",
@@ -165,13 +165,6 @@ component_images_no_changes: List[str] = [
     "registry.redhat.io/rhgs3/rhgs-gluster-block-prov-rhel7",
     "registry.redhat.io/rhgs3/rhgs-s3-server-rhel7",
 ]
-
-component_images: List[str] = [
-    f"{url}:{system_tag}"
-    for url in component_images_no_tag
-    for system_tag in system_tag_version
-]
-component_images.extend(component_images_no_changes)
 
 
 Namespace = str
@@ -355,9 +348,41 @@ image_map: Dict[Namespace, Dict[Repository, Tags]] = {
 }
 
 
-# Build the fqdn for the user images
-user_images: List[str] = []
-for namespace, repositories in image_map.items():
-    for repository, tags in repositories.items():
-        user_image = [f"{registry}/{namespace}/{repository}:{tag}" for tag in tags]
-        user_images.extend(user_image)
+class OpenshiftImages:
+    """ Class that aggregates all images together and builds
+    image URLs dynamically based on the `openshift_versions` 
+    and `registry` instance variables
+    
+    Usage: 
+    >>> from openshift_images import OpenshiftImages
+    >>> openshift_images = OpenshiftImages(['v3.11.154'], 'registry.redhat.io')
+    >>> print(openshift_images.all_images)
+    """
+
+    def __init__(
+        self,
+        openshift_versions: List[str] = ["v3.11.135", "v3.11.153"],
+        registry: str = "registry.redhat.io",
+    ):
+        self.openshift_versions = openshift_versions
+        self.registry = registry
+        self._create_image_list()
+
+    def _create_image_list(self):
+        self._component_images: List[str] = [
+            f"{url}:{openshift_version}"
+            for url in component_images_no_tag
+            for openshift_version in self.openshift_versions
+        ]
+
+        # Build the fqdn for the user images
+        self._user_images: List[str] = []
+        for namespace, repositories in image_map.items():
+            for repository, tags in repositories.items():
+                user_image = [
+                    f"{self.registry}/{namespace}/{repository}:{tag}" for tag in tags
+                ]
+                self._user_images.extend(user_image)
+
+        self.all_images = self._component_images + self._user_images
+        self.all_images.extend(component_images_no_changes)
