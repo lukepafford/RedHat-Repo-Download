@@ -12,7 +12,7 @@ repoFile="$1"
 dest="$2"
 
 for repoId in $(cat "$repoFile"); do
-        reposync --repoid=$repoId --downloadcomps --download-metadata --newest-only --download_path=$dest
+        reposync --repoid=$repoId --downloadcomps --download-metadata --newest-only -p =$dest
 done
 
 python get-yum-vars.py > $dest/yum_vars.json
